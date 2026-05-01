@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Input, List, Card, message, Button } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
+import React, { useState, useEffect } from 'react';
+import { Input, List, Card, message, Button, Tag } from 'antd';
+import { SearchOutlined, ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { stockService } from '@/services/stock';
 import { useUserStore } from '@/stores/userStore';
@@ -12,9 +12,20 @@ export interface StockItem {
     industry: string;
 }
 
+interface PriceData {
+    price?: number;
+    changePercent?: number;
+}
+
 interface SearchResponse {
     code: number;
     data: StockItem[];
+    message?: string;
+}
+
+interface PricesResponse {
+    code: number;
+    data: Record<string, PriceData>;
     message?: string;
 }
 
@@ -23,6 +34,28 @@ const Market: React.FC = () => {
     const logout = useUserStore((state) => state.logout);
     const [stocks, setStocks] = useState<StockItem[]>([]);
     const [loading, setLoading] = useState(false);
+    const [prices, setPrices] = useState<Record<string, PriceData>>({});
+
+    // 每3秒刷新一次价格
+    useEffect(() => {
+        const fetchPrices = async () => {
+            try {
+                const res = await stockService.getAllPrices() as unknown as PricesResponse;
+                if (res.code === 200) {
+                    setPrices(res.data);
+                }
+            } catch (error: unknown) {
+                console.error('获取价格失败', error);
+            }
+        };
+
+        void fetchPrices();
+        const interval = setInterval(() => {
+            void fetchPrices();
+        }, 3000);
+
+        return () => clearInterval(interval);
+    }, []);
 
     const handleSearch = async (keyword: string) => {
         if (!keyword) {
@@ -61,7 +94,10 @@ const Market: React.FC = () => {
                         <Button onClick={() => navigate('/dashboard')} style={{ marginRight: 8 }}>
                             返回首页
                         </Button>
-                        <Button danger onClick={logout}>
+                        <Button onClick={() => navigate('/trade')}>
+                            交易
+                        </Button>
+                        <Button danger style={{ marginLeft: 8 }} onClick={logout}>
                             退出登录
                         </Button>
                     </div>
@@ -69,14 +105,40 @@ const Market: React.FC = () => {
 
                 <List
                     dataSource={stocks}
-                    renderItem={(item: StockItem) => (
-                        <List.Item>
-                            <List.Item.Meta
-                                title={`${item.name} (${item.symbol})`}
-                                description={`市场: ${item.market} | 行业: ${item.industry}`}
-                            />
-                        </List.Item>
-                    )}
+                    renderItem={(item: StockItem) => {
+                        const priceData = prices[item.symbol] || {};
+                        const currentPrice = priceData.price || 0;
+                        const changePercent = priceData.changePercent || 0;
+                        const isUp = changePercent > 0;
+
+                        return (
+                            <List.Item>
+                                <List.Item.Meta
+                                    title={
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                            <span>{item.name} ({item.symbol})</span>
+                                            {currentPrice > 0 && (
+                                                <Tag color={isUp ? 'red' : 'green'}>
+                                                    {isUp ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
+                                                    {Math.abs(Number(changePercent)).toFixed(2)}%
+                                                </Tag>
+                                            )}
+                                        </div>
+                                    }
+                                    description={
+                                        <div>
+                                            <div>市场: {item.market} | 行业: {item.industry}</div>
+                                            {currentPrice > 0 && (
+                                                <div style={{ marginTop: 4, fontSize: 16, fontWeight: 'bold', color: isUp ? '#ff4d4f' : '#52c41a' }}>
+                                                    ¥{Number(currentPrice).toFixed(2)}
+                                                </div>
+                                            )}
+                                        </div>
+                                    }
+                                />
+                            </List.Item>
+                        );
+                    }}
                 />
             </Card>
         </div>

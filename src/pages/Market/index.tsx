@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { stockService } from '@/services/stock';
 import { useUserStore } from '@/stores/userStore';
 
-interface StockItem {
+export interface StockItem {
     name: string;
     symbol: string;
     market: string;

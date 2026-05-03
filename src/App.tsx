@@ -5,6 +5,7 @@ import Market from './pages/Market';
 import Trade from './pages/Trade';
 import Portfolio from './pages/Portfolio';
 import Assets from './pages/Assets';
+import TradeRecords from './pages/TradeRecords';
 import { useUserStore } from './stores/userStore';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -36,6 +37,10 @@ function App() {
 
                 <Route path="/assets" element={
                     <ProtectedRoute><Assets /></ProtectedRoute>
+                } />
+
+                <Route path="/trade-records" element={
+                    <ProtectedRoute><TradeRecords /></ProtectedRoute>
                 } />
 
                 <Route path="/" element={<Navigate to="/dashboard" />} />

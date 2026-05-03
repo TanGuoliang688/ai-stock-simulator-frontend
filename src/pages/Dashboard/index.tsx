@@ -18,6 +18,9 @@ const Dashboard: React.FC = () => {
                     <Button onClick={() => navigate('/trade')}>
                         模拟交易
                     </Button>
+                    <Button onClick={() => navigate('/trade-records')}>
+                        交易记录
+                    </Button>
                     <Button onClick={() => navigate('/portfolio')}>
                         我的持仓
                     </Button>

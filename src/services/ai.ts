@@ -9,17 +9,17 @@ export interface AIResponse {
 export const aiService = {
     // 智能选股推荐
     getStockRecommendations: (marketTrend?: string) =>
-        api.get<string>('/ai/recommendations', { params: { marketTrend } }),
+        api.get('/ai/recommendations', { params: { marketTrend } }) as Promise<AIResponse>,
 
     // 交易建议
     getTradeAdvice: () =>
-        api.get<string>('/ai/trade-advice'),
+        api.get('/ai/trade-advice') as Promise<AIResponse>,
 
     // 市场分析
     getMarketAnalysis: () =>
-        api.get<string>('/ai/market-analysis'),
+        api.get('/ai/market-analysis') as Promise<AIResponse>,
 
     // 持仓分析
     getPortfolioAnalysis: () =>
-        api.get<string>('/ai/portfolio-analysis'),
+        api.get('/ai/portfolio-analysis') as Promise<AIResponse>,
 };

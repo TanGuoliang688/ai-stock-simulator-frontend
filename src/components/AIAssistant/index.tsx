@@ -6,12 +6,6 @@ import ReactMarkdown from 'react-markdown';
 
 const { Panel } = Collapse;
 
-interface AIResponse {
-    code: number;
-    data: string;
-    message?: string;
-}
-
 const AIAssistant: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [recommendations, setRecommendations] = useState<string>('');
@@ -23,21 +17,23 @@ const AIAssistant: React.FC = () => {
     const loadAllAnalysis = async () => {
         setLoading(true);
         try {
+            // 并行调用 AI 服务
             const [recsRes, adviceRes, analysisRes, portfolioRes] = await Promise.all([
-                aiService.getStockRecommendations() as unknown as AIResponse,
-                aiService.getTradeAdvice() as unknown as AIResponse,
-                aiService.getMarketAnalysis() as unknown as AIResponse,
-                aiService.getPortfolioAnalysis() as unknown as AIResponse,
+                aiService.getStockRecommendations(),
+                aiService.getTradeAdvice(),
+                aiService.getMarketAnalysis(),
+                aiService.getPortfolioAnalysis(),
             ]);
 
+            // TypeScript 会自动推断类型，无需显式声明
             if (recsRes.code === 200) setRecommendations(recsRes.data);
             if (adviceRes.code === 200) setTradeAdvice(adviceRes.data);
             if (analysisRes.code === 200) setMarketAnalysis(analysisRes.data);
             if (portfolioRes.code === 200) setPortfolioAnalysis(portfolioRes.data);
 
-            message.success('AI 分析完成');
+            void message.success('AI 分析完成');
         } catch {
-            message.error('AI 分析失败，请稍后重试');
+            void message.error('AI 分析失败，请稍后重试');
         } finally {
             setLoading(false);
         }
@@ -63,10 +59,12 @@ const AIAssistant: React.FC = () => {
             }
         >
             <Spin spinning={loading}>
-                <Collapse defaultActiveKey={['1']}>
-                    <Panel header="🎯 智能选股推荐" key="1">
+                <Collapse defaultActiveKey={['1', '2', '3', '4']}>
+                    <Panel header=" 智能选股推荐" key="1">
                         {recommendations ? (
-                            <div style={{ whiteSpace: 'pre-wrap' }}><ReactMarkdown>{recommendations}</ReactMarkdown></div>
+                            <div style={{ lineHeight: 1.8 }}>
+                                <ReactMarkdown>{recommendations}</ReactMarkdown>
+                            </div>
                         ) : (
                             <div style={{ textAlign: 'center', padding: 20, color: '#999' }}>
                                 点击"开始分析"获取智能选股推荐
@@ -76,7 +74,9 @@ const AIAssistant: React.FC = () => {
 
                     <Panel header="💡 交易建议" key="2">
                         {tradeAdvice ? (
-                            <div style={{ whiteSpace: 'pre-wrap' }}><ReactMarkdown>{tradeAdvice}</ReactMarkdown></div>
+                            <div style={{ lineHeight: 1.8 }}>
+                                <ReactMarkdown>{tradeAdvice}</ReactMarkdown>
+                            </div>
                         ) : (
                             <div style={{ textAlign: 'center', padding: 20, color: '#999' }}>
                                 点击"开始分析"获取交易建议
@@ -84,9 +84,11 @@ const AIAssistant: React.FC = () => {
                         )}
                     </Panel>
 
-                    <Panel header="📈 市场分析" key="3">
+                    <Panel header=" 市场分析" key="3">
                         {marketAnalysis ? (
-                            <div style={{ whiteSpace: 'pre-wrap' }}><ReactMarkdown>{marketAnalysis}</ReactMarkdown></div>
+                            <div style={{ lineHeight: 1.8 }}>
+                                <ReactMarkdown>{marketAnalysis}</ReactMarkdown>
+                            </div>
                         ) : (
                             <div style={{ textAlign: 'center', padding: 20, color: '#999' }}>
                                 点击"开始分析"获取市场分析
@@ -96,7 +98,9 @@ const AIAssistant: React.FC = () => {
 
                     <Panel header="📊 持仓分析" key="4">
                         {portfolioAnalysis ? (
-                            <div style={{ whiteSpace: 'pre-wrap' }}><ReactMarkdown>{portfolioAnalysis}</ReactMarkdown></div>
+                            <div style={{ lineHeight: 1.8 }}>
+                                <ReactMarkdown>{portfolioAnalysis}</ReactMarkdown>
+                            </div>
                         ) : (
                             <div style={{ textAlign: 'center', padding: 20, color: '#999' }}>
                                 点击"开始分析"获取持仓分析

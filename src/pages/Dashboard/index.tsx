@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, Button, Space } from 'antd';
 import { useUserStore } from '@/stores/userStore';
 import { useNavigate } from 'react-router-dom';
+import AIAssistant from '@/components/AIAssistant';
 
 const Dashboard: React.FC = () => {
     const logout = useUserStore((state) => state.logout);
@@ -9,7 +10,7 @@ const Dashboard: React.FC = () => {
 
     return (
         <div style={{ padding: 24 }}>
-            <Card title="欢迎使用 AI模拟炒股大师">
+            <Card title="欢迎使用 AI模拟炒股大师" style={{ marginBottom: 16 }}>
                 <p>这是一个智能模拟炒股平台</p>
                 <Space wrap>
                     <Button type="primary" onClick={() => navigate('/market')}>
@@ -32,6 +33,9 @@ const Dashboard: React.FC = () => {
                     </Button>
                 </Space>
             </Card>
+
+            {/* AI 助手 */}
+            <AIAssistant />
         </div>
     );
 };

@@ -7,6 +7,7 @@ import Portfolio from './pages/Portfolio';
 import Assets from './pages/Assets';
 import TradeRecords from './pages/TradeRecords';
 import { useUserStore } from './stores/userStore';
+import StockDetail from './pages/StockDetail';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     const token = useUserStore((state) => state.token);
@@ -44,6 +45,10 @@ function App() {
                 } />
 
                 <Route path="/" element={<Navigate to="/dashboard" />} />
+
+                <Route path="/stock/:symbol" element={
+                    <ProtectedRoute><StockDetail /></ProtectedRoute>
+                } />
             </Routes>
         </BrowserRouter>
     );

@@ -5,36 +5,40 @@ import { useNavigate } from 'react-router-dom';
 import { stockService } from '@/services/stock';
 import { useUserStore } from '@/stores/userStore';
 
-export interface StockItem {
-    name: string;
+export interface StockVO {
     symbol: string;
+    name: string;
     market: string;
     industry: string;
 }
 
 interface PriceData {
-    price?: number;
-    changePercent?: number;
+    price: number;
+    changePercent: number;
+}
+
+export interface PricesMap {
+    [symbol: string]: PriceData;
 }
 
 interface SearchResponse {
     code: number;
-    data: StockItem[];
+    data: StockVO[];
     message?: string;
 }
 
 interface PricesResponse {
     code: number;
-    data: Record<string, PriceData>;
+    data: PricesMap;
     message?: string;
 }
 
 const Market: React.FC = () => {
     const navigate = useNavigate();
     const logout = useUserStore((state) => state.logout);
-    const [stocks, setStocks] = useState<StockItem[]>([]);
+    const [stocks, setStocks] = useState<StockVO[]>([]);
     const [loading, setLoading] = useState(false);
-    const [prices, setPrices] = useState<Record<string, PriceData>>({});
+    const [prices, setPrices] = useState<PricesMap>({});
 
     // 每3秒刷新一次价格
     useEffect(() => {
@@ -97,6 +101,9 @@ const Market: React.FC = () => {
                         <Button onClick={() => navigate('/trade')}>
                             交易
                         </Button>
+                        <Button onClick={() => navigate('/trade-records')} style={{ marginLeft: 8 }}>
+                            交易记录
+                        </Button>
                         <Button danger style={{ marginLeft: 8 }} onClick={logout}>
                             退出登录
                         </Button>
@@ -105,14 +112,23 @@ const Market: React.FC = () => {
 
                 <List
                     dataSource={stocks}
-                    renderItem={(item: StockItem) => {
-                        const priceData = prices[item.symbol] || {};
-                        const currentPrice = priceData.price || 0;
-                        const changePercent = priceData.changePercent || 0;
+                    renderItem={(item: StockVO) => {
+                        const priceData = prices[item.symbol];
+                        const currentPrice = priceData?.price || 0;
+                        const changePercent = priceData?.changePercent || 0;
                         const isUp = changePercent > 0;
 
                         return (
-                            <List.Item>
+                            <List.Item
+                                style={{ cursor: 'pointer', transition: 'background-color 0.3s' }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.backgroundColor = '#f5f5f5';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor = 'transparent';
+                                }}
+                                onClick={() => navigate(`/stock/${item.symbol}`)}
+                            >
                                 <List.Item.Meta
                                     title={
                                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

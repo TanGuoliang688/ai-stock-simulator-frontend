@@ -60,6 +60,7 @@ const Trade: React.FC = () => {
     const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
     const [userPositions, setUserPositions] = useState<Position[]>([]);
     const [form] = Form.useForm();
+    const [quantityValue, setQuantityValue] = useState<number | undefined>(undefined);
 
     useEffect(() => {
         void loadUserInfo();
@@ -130,6 +131,7 @@ const Trade: React.FC = () => {
                 form.resetFields();
                 setSelectedStock(null);
                 setCurrentPrice(0);
+                setQuantityValue(undefined);
                 void loadUserInfo();
                 void loadPositions();
             }
@@ -150,6 +152,7 @@ const Trade: React.FC = () => {
                 form.resetFields();
                 setSelectedStock(null);
                 setCurrentPrice(0);
+                setQuantityValue(undefined);
                 void loadUserInfo();
                 void loadPositions();
             }
@@ -169,6 +172,7 @@ const Trade: React.FC = () => {
             const maxQty = calculateMaxBuy(price);
 
             if (maxQty >= 100) {
+                setQuantityValue(maxQty);
                 form.setFieldsValue({ quantity: maxQty });
                 void message.success(`已填入最大可买数量: ${maxQty}股`);
             } else {
@@ -178,6 +182,7 @@ const Trade: React.FC = () => {
             const qty = getPositionQuantity(symbol);
 
             if (qty >= 100) {
+                setQuantityValue(qty);
                 form.setFieldsValue({ quantity: qty });
                 void message.success(`已填入持仓数量: ${qty}股`);
             } else {
@@ -265,7 +270,11 @@ const Trade: React.FC = () => {
                                 placeholder="买入数量（股）"
                                 min={100}
                                 step={100}
-                                value={form.getFieldValue('quantity')}
+                                value={quantityValue}
+                                onChange={(value) => {
+                                    setQuantityValue(value || undefined);
+                                    form.setFieldsValue({ quantity: value });
+                                }}
                             />
                             <Button
                                 htmlType="button"
@@ -368,7 +377,11 @@ const Trade: React.FC = () => {
                                 min={100}
                                 step={100}
                                 max={selectedStock ? getPositionQuantity(selectedStock.symbol) : undefined}
-                                value={form.getFieldValue('quantity')}
+                                value={quantityValue}
+                                onChange={(value) => {
+                                    setQuantityValue(value || undefined);
+                                    form.setFieldsValue({ quantity: value });
+                                }}
                             />
                             <Button htmlType="button" onClick={() => handleSetMaxQuantity('sell')}>
                                 全部

@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
+import Register from './pages/Register'; // 1. 导入注册页面
 import Dashboard from './pages/Dashboard';
 import Market from './pages/Market';
 import Trade from './pages/Trade';
@@ -19,6 +20,7 @@ function App() {
         <BrowserRouter>
             <Routes>
                 <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} /> {/* 2. 添加注册路由 */}
 
                 <Route path="/dashboard" element={
                     <ProtectedRoute><Dashboard /></ProtectedRoute>
@@ -49,6 +51,7 @@ function App() {
                 <Route path="/stock/:symbol" element={
                     <ProtectedRoute><StockDetail /></ProtectedRoute>
                 } />
+
             </Routes>
         </BrowserRouter>
     );

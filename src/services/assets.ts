@@ -22,9 +22,20 @@ export interface PositionDistribution {
     percentage: number;
 }
 
+
+// --- API 响应包装类型 ---
+export interface ApiResponse<T> {
+    code: number;
+    data: T;
+    message?: string;
+}
+
 export const assetService = {
     // 获取资产概览
-    getSummary: () => api.get<AssetSummary>('/assets/summary'),
+    getSummary: async (): Promise<AssetSummary> => {
+        const response = await api.get<AssetSummary>('/assets/summary');
+        return response.data;
+    },
 
     // 获取资产历史（模拟数据）
     getHistory: async (days: number = 30): Promise<AssetHistory[]> => {
@@ -47,6 +58,8 @@ export const assetService = {
         }));
     },
 };
+
+
 
 // 生成模拟资产历史数据
 function generateMockAssetHistory(days: number): AssetHistory[] {
